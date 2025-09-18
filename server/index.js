@@ -14,8 +14,19 @@ server.listen(port, () => {
 const express = require('express');
 const app = express();
 
+const path = require('path');
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/'});
+const storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null,path.join(__dirname, 'uploads'));
+	},
+	filename: function (req, file, cb) {
+		//const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 0E9)
+		cb(null, file.originalname);
+	}
+})
+const upload = multer({ storage });
+
 
 app.get('/', (req, res) => {
 	res.send("Hello World");
@@ -23,6 +34,8 @@ app.get('/', (req, res) => {
 
 app.post('/api/upload', upload.single('file'),(req, res) => {
 	res.send("uploaded successfully");
+	console.log(res.file);
+	//res.json(req.file);
 });
 
 
