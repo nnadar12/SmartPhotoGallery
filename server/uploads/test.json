@@ -1,0 +1,26 @@
+{
+  "image": "test.jpg",
+  "analyzed_at": "1759005335.6789675",
+  "predictions": [
+    {
+      "label": "pasture",
+      "confidence": 0.26705223321914673
+    },
+    {
+      "label": "rice_paddy",
+      "confidence": 0.0944410189986229
+    },
+    {
+      "label": "pond",
+      "confidence": 0.09028425067663193
+    },
+    {
+      "label": "lawn",
+      "confidence": 0.0817437395453453
+    },
+    {
+      "label": "field_road",
+      "confidence": 0.06929358094930649
+    }
+  ]
+}
