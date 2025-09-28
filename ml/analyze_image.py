@@ -1,6 +1,7 @@
+
 import os
+import json
 import torch
-import torch.nn as nn
 import torchvision.models as models
 import torchvision.transforms as transforms
 from PIL import Image
@@ -47,9 +48,23 @@ input_img = transform(img).unsqueeze(0)  # add batch dimension
 logits = model.forward(input_img)
 probs = torch.nn.functional.softmax(logits, 1)
 
-# --- Step 6: Print top 5 predictions ---
+# --- Step 6: Collect top 5 predictions ---
 top5 = torch.topk(probs, 5)
-print("\nTop 5 scene predictions:")
-for idx in top5.indices[0]:
-    print(f"- {classes[idx]} ({probs[0][idx].item():.4f})")
 
+results = []
+for idx in top5.indices[0]:
+    results.append({
+        "label": classes[idx],
+        "confidence": float(probs[0][idx].item())
+    })
+
+# --- Step 7: Save results to JSON ---
+json_path = os.path.splitext(img_path)[0] + ".json"
+with open(json_path, "w") as f:
+    json.dump({
+        "image": os.path.basename(img_path),
+        "analyzed_at": str(os.path.getmtime(img_path)),  # timestamp of file
+        "predictions": results
+    }, f, indent=2)
+
+print(f"Analysis written to {json_path}")
