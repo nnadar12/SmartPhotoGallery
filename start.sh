@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Exit on error
+set -e
+
 echo "Starting FastAPI server..."
 source venv/bin/activate
 cd ml
@@ -9,8 +12,7 @@ FASTAPI_PID=$!
 cd ..
 
 echo "Waiting for ML model to load..."
-# Give FastAPI 5-10 seconds to load the model into memory.
-# You might need to adjust this time based on your computer's speed.
+# Give FastAPI 5-10 seconds to load the model into memory
 sleep 8
 
 echo "Starting Express server..."
@@ -20,7 +22,19 @@ node index.js &
 NODE_PID=$!
 cd ..
 
+echo "Waiting for Express server to stabilize..."
+sleep 3
+
+echo "Starting React client..."
+cd client
+npm start &
+REACT_PID=$!
+cd ..
+
 echo "All servers started"
-echo "Node PID: $NODE_PID, FastAPI PID: $FASTAPI_PID"
+echo "FastAPI PID: $FASTAPI_PID, Node PID: $NODE_PID, React PID: $REACT_PID"
+
+# Kill all processes when the script exits
+trap "kill $FASTAPI_PID $NODE_PID $REACT_PID" EXIT
 
 wait
