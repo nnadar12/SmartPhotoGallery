@@ -1,0 +1,27 @@
+[
+    {
+        "image": "1759380826860.jpg",
+        "results": [
+            {
+                "label": "amusement_park",
+                "probability": 0.15656708180904388
+            },
+            {
+                "label": "bridge",
+                "probability": 0.15492257475852966
+            },
+            {
+                "label": "canal/natural",
+                "probability": 0.0834144577383995
+            },
+            {
+                "label": "river",
+                "probability": 0.0808139443397522
+            },
+            {
+                "label": "rope_bridge",
+                "probability": 0.06956954300403595
+            }
+        ]
+    }
+]

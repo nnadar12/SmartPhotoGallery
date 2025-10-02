@@ -1,31 +1,23 @@
-
 import os
-import json
 import torch
 import torchvision.models as models
 import torchvision.transforms as transforms
 from PIL import Image
+import json
 
 # Paths
-UPLOADS_DIR = "../server/uploads"
 MODEL_FILE = "models/resnet18_places365.pth.tar"
 CATEGORIES_FILE = "models/categories_places365.txt"
+OUTPUT_JSON = "analysis.json"
 
-# --- Step 1: Get the first file in uploads ---
-files = [f for f in os.listdir(UPLOADS_DIR) if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
-if not files:
-    raise FileNotFoundError("No images found in uploads folder.")
-img_path = os.path.join(UPLOADS_DIR, files[0])
-print(f"Analyzing: {img_path}")
-
-# --- Step 2: Load labels ---
+# --- Load categories ---
 classes = []
 with open(CATEGORIES_FILE) as class_file:
     for line in class_file:
         classes.append(line.strip().split(' ')[0][3:])
 classes = tuple(classes)
 
-# --- Step 3: Define transforms ---
+# --- Define transforms ---
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
@@ -35,36 +27,49 @@ transform = transforms.Compose([
     )
 ])
 
-# --- Step 4: Load model ---
+# --- Load model once (global) ---
 model = models.resnet18(num_classes=365)
 checkpoint = torch.load(MODEL_FILE, map_location=torch.device('cpu'))
 state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint['state_dict'].items()}
 model.load_state_dict(state_dict)
 model.eval()
 
-# --- Step 5: Run inference ---
-img = Image.open(img_path)
-input_img = transform(img).unsqueeze(0)  # add batch dimension
-logits = model.forward(input_img)
-probs = torch.nn.functional.softmax(logits, 1)
 
-# --- Step 6: Collect top 5 predictions ---
-top5 = torch.topk(probs, 5)
+def analyze_and_store(img_path: str):
+    """Analyze an image and append results to analysis.json"""
+    img = Image.open(img_path).convert("RGB")
+    input_img = transform(img).unsqueeze(0)
 
-results = []
-for idx in top5.indices[0]:
-    results.append({
-        "label": classes[idx],
-        "confidence": float(probs[0][idx].item())
-    })
+    logits = model.forward(input_img)
+    probs = torch.nn.functional.softmax(logits, 1)
 
-# --- Step 7: Save results to JSON ---
-json_path = os.path.splitext(img_path)[0] + ".json"
-with open(json_path, "w") as f:
-    json.dump({
+    top5 = torch.topk(probs, 5)
+    results = []
+    for idx in top5.indices[0]:
+        results.append({
+            "label": classes[idx],
+            "probability": float(probs[0][idx].item())
+        })
+
+    # Create entry
+    entry = {
         "image": os.path.basename(img_path),
-        "analyzed_at": str(os.path.getmtime(img_path)),  # timestamp of file
-        "predictions": results
-    }, f, indent=2)
+        "results": results
+    }
 
-print(f"Analysis written to {json_path}")
+    # Append to JSON file
+    if os.path.exists(OUTPUT_JSON):
+        with open(OUTPUT_JSON, "r") as f:
+            try:
+                data = json.load(f)
+            except json.JSONDecodeError:
+                data = []
+    else:
+        data = []
+
+    data.append(entry)
+
+    with open(OUTPUT_JSON, "w") as f:
+        json.dump(data, f, indent=4)
+
+    return entry
