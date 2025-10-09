@@ -1,6 +1,6 @@
 [
     {
-        "image": "1759976392301.jpg",
+        "image": "1759977254643.jpg",
         "results": [
             {
                 "label": "swimming_hole",
@@ -21,6 +21,56 @@
             {
                 "label": "rainforest",
                 "probability": 0.022145625203847885
+            }
+        ]
+    },
+    {
+        "image": "1759977287751.jpg",
+        "results": [
+            {
+                "label": "pasture",
+                "probability": 0.26705223321914673
+            },
+            {
+                "label": "rice_paddy",
+                "probability": 0.0944410189986229
+            },
+            {
+                "label": "pond",
+                "probability": 0.09028425067663193
+            },
+            {
+                "label": "lawn",
+                "probability": 0.0817437395453453
+            },
+            {
+                "label": "field_road",
+                "probability": 0.06929358094930649
+            }
+        ]
+    },
+    {
+        "image": "1759977298224.jpg",
+        "results": [
+            {
+                "label": "beach",
+                "probability": 0.8548488616943359
+            },
+            {
+                "label": "ocean",
+                "probability": 0.060612279921770096
+            },
+            {
+                "label": "coast",
+                "probability": 0.04704144224524498
+            },
+            {
+                "label": "lagoon",
+                "probability": 0.01316031999886036
+            },
+            {
+                "label": "wave",
+                "probability": 0.007543762214481831
             }
         ]
     }
