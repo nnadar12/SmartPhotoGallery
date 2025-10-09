@@ -8,7 +8,7 @@ import json
 # Paths
 MODEL_FILE = "models/resnet18_places365.pth.tar"
 CATEGORIES_FILE = "models/categories_places365.txt"
-OUTPUT_JSON = "analysis.json"
+OUTPUT_JSON = "../server/uploads/analysis.json"
 
 # --- Load categories ---
 classes = []

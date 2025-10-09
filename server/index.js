@@ -31,7 +31,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// File upload route
+// --- File upload route ---
 app.post("/api/upload", upload.single("file"), async (req, res) => {
     try {
         const filePath = path.join(uploadDir, req.file.filename);
@@ -47,12 +47,12 @@ app.post("/api/upload", upload.single("file"), async (req, res) => {
             analysis: response.data,
         });
     } catch (err) {
-        console.error(err);
+        console.error("Error uploading or analyzing image:", err.message);
         res.status(500).json({ error: "Upload failed" });
     }
 });
 
-// Endpoint to fetch uploaded images
+// --- Endpoint to fetch all uploaded images ---
 app.get("/api/images", (req, res) => {
     fs.readdir(uploadDir, (err, files) => {
         if (err) {
@@ -62,7 +62,32 @@ app.get("/api/images", (req, res) => {
     });
 });
 
-// Start server
+// --- NEW: Search endpoint ---
+app.get("/api/search", (req, res) => {
+    const query = req.query.q?.toLowerCase();
+    if (!query) {
+        return res.status(400).json({ error: "Missing search query" });
+    }
+
+    const analysisFile = path.join(uploadDir, "analysis.json");
+    if (!fs.existsSync(analysisFile)) {
+        return res.json([]);
+    }
+
+    try {
+        const data = JSON.parse(fs.readFileSync(analysisFile, "utf-8"));
+        const results = data.filter((entry) =>
+            entry.results.some((r) => r.label.toLowerCase().includes(query))
+        );
+
+        res.json(results);
+    } catch (err) {
+        console.error("Error reading analysis.json:", err);
+        res.status(500).json({ error: "Error reading analysis data" });
+    }
+});
+
+// --- Start server ---
 app.listen(PORT, () => {
     console.log(`Express listening on port ${PORT}`);
 });
