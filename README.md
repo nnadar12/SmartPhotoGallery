@@ -23,20 +23,20 @@ This project allows users to upload photos to their home server from a web front
 After cloning the repository:
 
 1. Set up python environment
-    <pre>```bash cd ml
+    <pre>bash cd ml
     python3 -m venv venv
     source venv/bin/activate
-    pip install fastapi uvicorn torch torchvision pillow```</pre>
+    pip install fastapi uvicorn torch torchvision pillow</pre>
 
 2. Set up Node.js server dependencies
-    <pre>```bash cd server
+    <pre>cd server
     npm install express multer cors axios
     cd ../client
-    npm install```</pre>
+    npm install</pre>
 
 3. Start all servers
-    <pre>```bash chmod +x start.sh
-    ./start.sh```</pre>
+    <pre>chmod +x start.sh
+    ./start.sh</pre>
 
     - FastAPI server starts on port 8000
     - Express.js server starts on port 5000
